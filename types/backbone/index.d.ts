@@ -19,7 +19,6 @@ export = Backbone;
 export as namespace Backbone;
 
 import * as _ from 'underscore';
-import { TSModuleDeclaration } from '../../../../../../Library/Caches/typescript/4.3/node_modules/@babel/types/lib/index';
 
 declare namespace Backbone {
     type _Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
