@@ -628,3 +628,15 @@ function testRouter() {
 
     router.execute((param1, param2) => {}, ['param1', 'param2'], 'routeName');
 }
+
+function testViewExtend() {
+    const MyTestView = Backbone.View.extend({
+        myInstanceProperty() { return this.$el; },
+    }, {
+        myStaticProperty: () => 'static property via .extend',
+    });
+    MyTestView.myStaticProperty();
+    
+    const testViewInstance = new MyTestView();
+    testViewInstance.myInstanceProperty();
+}
