@@ -9,6 +9,7 @@
 //                 Kyle Scully <https://github.com/zieka>
 //                 Robert Kesterson <https://github.com/rkesters>
 //                 Bulat Khasanov <https://github.com/khasanovbi>
+//                 jharrilim <https://github.com/jharrilim>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.8
 
@@ -18,6 +19,7 @@ export = Backbone;
 export as namespace Backbone;
 
 import * as _ from 'underscore';
+import { TSModuleDeclaration } from '../../../../../../Library/Caches/typescript/4.3/node_modules/@babel/types/lib/index';
 
 declare namespace Backbone {
     type _Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
@@ -216,7 +218,12 @@ declare namespace Backbone {
         /**
          * Do not use, prefer TypeScript's extend functionality.
          */
-        static extend(properties: any, classProperties?: any): any;
+        static extend<TProps = {}, TClassProps = {}>(
+            properties: TProps,
+            classProperties?: TClassProps
+        ): {
+            new(attributes: T, options: E): Model<TProps, S, E>;
+        } & TClassProps;
 
         attributes: Partial<T>;
         changed: Partial<T>;
@@ -531,25 +538,31 @@ declare namespace Backbone {
         private _updateHash(location: Location, fragment: string, replace: boolean): void;
     }
 
-    interface ViewOptions<TModel extends Model = Model> {
+    type ViewOptions<TModel extends Model = Model, TCollectionModel extends Model = Model, TProps = {}> = {
         model?: TModel;
-        // TODO: quickfix, this can't be fixed easy. The collection does not need to have the same model as the parent view.
-        collection?: Collection<any>; // was: Collection<TModel>;
+        collection?: Collection<TCollectionModel>;
         el?: HTMLElement | JQuery | string;
         id?: string;
         attributes?: Record<string, any>;
         className?: string;
         tagName?: string;
         events?: _Result<EventsHash>;
-    }
+    } & TProps;
 
     type ViewEventListener = (event: JQuery.Event) => void;
 
-    class View<TModel extends Model = Model> extends EventsMixin implements Events {
+    class View<TModel extends Model = Model, TCollectionModel extends Model = Model> extends EventsMixin implements Events {
         /**
          * Do not use, prefer TypeScript's extend functionality.
          */
-        static extend(properties: any, classProperties?: any): any;
+        static extend<TModel extends Model = Model, TCollectionModel extends Model = Model, TProps = {}, TClassProps = {}>(
+            properties: ViewOptions<TModel, TCollectionModel, TProps>,
+            classProperties?: TClassProps
+        ):  { 
+            new<TNewProps = {}>(
+                properties?: ViewOptions<TModel, TCollectionModel, TNewProps>,
+            ): View<TModel, TCollectionModel> & TProps & TNewProps;
+        } & TClassProps;
 
         /**
          * For use with views as ES classes. If you define a preinitialize
@@ -570,7 +583,7 @@ declare namespace Backbone {
         events(): EventsHash;
 
         model: TModel;
-        collection: Collection<TModel>;
+        collection: Collection<TCollectionModel>;
         setElement(element: HTMLElement | JQuery): this;
         id?: string;
         cid: string;
